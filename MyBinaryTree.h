@@ -11,52 +11,77 @@ template<typename T>
 class MyBinaryTree
 {
 private:
-    T field;
-public:
-    MyBinaryTree *left;
-    MyBinaryTree *right;
-
-    MyBinaryTree() : field(NULL), left(NULL), right(NULL) {} //Default Constructor
-
-    MyBinaryTree(const MyBinaryTree &other) : field(NULL), left(NULL), right(NULL) //Copy Constructor
-    { /* надо реализовать */}
-
-    ~MyBinaryTree() //Destructor
+    struct TreeNode
     {
-        destroy(this);
+        explicit TreeNode(T new_value) : value(new_value), left(NULL), right(NULL) {}
+        T value;
+        TreeNode *left;
+        TreeNode *right;
+    };
+public:
+    TreeNode *root;
+
+    MyBinaryTree() : root(NULL) {} //Default Constructor
+
+    MyBinaryTree(const MyBinaryTree &other) : root(NULL) //Copy Constructor
+    {
+        //TreeNode
     }
 
-    void destroy(MyBinaryTree *node);
+    ~MyBinaryTree() { //Destructor
+        destroy(root);
+    }
+
+    void destroy(TreeNode *node);
 
     void push(T new_value);
 
-    friend std::ostream &operator<<(std::ostream &o, const MyBinaryTree<T> &tree)
-    { /* надо реализовать */}
+    std::ostream& print(std::ostream &out, TreeNode *node) const;
+
+    friend std::ostream& operator<<(std::ostream &out, const MyBinaryTree<T> &tree)
+    {
+        typename MyBinaryTree<T>::TreeNode *cur = tree.root;
+        out << tree.print(out, cur);
+        return out;
+    }
 };
 
 template<typename T>
-void MyBinaryTree<T>::destroy(MyBinaryTree *node)
-{
-    if (node != NULL)
-    {
-        destroy(node->left);
-        destroy(node->right);
-        delete node;
+void MyBinaryTree<T>::destroy(TreeNode *node) {
+    TreeNode *cur = node;
+    if (cur != NULL) {
+        destroy(cur->left);
+        destroy(cur->right);
+        delete cur;
     }
 }
 
 template<typename T>
-void MyBinaryTree<T>::push(T new_value)
-{
-    MyBinaryTree current = this;
-    while(this != NULL)
+void MyBinaryTree<T>::push(T new_value) {
+    TreeNode *new_node = new TreeNode(new_value);
+    TreeNode *cur = root;
+    while (cur != NULL)
     {
-        if (new_value < this->right)
-            current = this->left;
-        else if (new_value > this-> left)
-            current = this->right;
+        if (cur->value > new_value)
+            cur = cur->left;
+        else
+            cur = cur->right;
     }
-    this->value = new_value;
+    cur = new_node;
+    cur->left = cur->right = NULL;
+}
+
+template<typename T>
+std::ostream& MyBinaryTree<T>::print(std::ostream &out, TreeNode *node) const
+{
+    TreeNode *cur = node;
+    if (cur != NULL)
+    {
+        print(cur->left);
+        print(cur->right);
+        out << cur->value;
+    }
+    return out;
 }
 
 #endif //CPP_LAB_10_MYBINARYTREE_H
