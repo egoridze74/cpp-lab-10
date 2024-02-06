@@ -6,82 +6,93 @@
 #define CPP_LAB_10_MYBINARYTREE_H
 
 #include <iostream>
+#include <string>
 
 template<typename T>
-class MyBinaryTree
-{
+class MyBinaryTree {
 private:
-    struct TreeNode
-    {
-        explicit TreeNode(T new_value) : value(new_value), left(NULL), right(NULL) {}
+    struct TreeNode {
         T value;
         TreeNode *left;
         TreeNode *right;
+
+        explicit TreeNode(T new_value) : value(new_value), left(NULL), right(NULL) {}
     };
+
+    void print_node(const TreeNode *cur, size_t depth) const {
+        if (cur == NULL) {
+            for (size_t i = 0; i < depth; ++i)
+                std::cout << '\t';
+            std::cout << "none" << std::endl;
+            return;
+        }
+        print_node(cur->right, depth + 1);
+        for (size_t i = 0; i < depth; ++i)
+            std::cout << '\t';
+        std::cout << cur->value << std::endl;
+        print_node(cur->left, depth + 1);
+    }
+
+
+    void destroy(TreeNode *node) {
+        if (node != NULL) {
+            destroy(node->left);
+            destroy(node->right);
+            delete node;
+        }
+    }
+
 public:
     TreeNode *root;
 
     MyBinaryTree() : root(NULL) {} //Default Constructor
 
-    MyBinaryTree(const MyBinaryTree &other) : root(NULL) //Copy Constructor
+    explicit MyBinaryTree(T value) { root = new TreeNode(value); }
+
+    MyBinaryTree(const MyBinaryTree &other) //Copy Constructor
     {
-        //TreeNode
+        this->root = other.root;
     }
 
     ~MyBinaryTree() { //Destructor
         destroy(root);
     }
 
-    void destroy(TreeNode *node);
-
     void push(T new_value);
 
-    std::ostream& print(std::ostream &out, TreeNode *node) const;
-
-    friend std::ostream& operator<<(std::ostream &out, const MyBinaryTree<T> &tree)
-    {
-        typename MyBinaryTree<T>::TreeNode *cur = tree.root;
-        out << tree.print(out, cur);
+    friend std::ostream &operator<<(std::ostream &out, const MyBinaryTree<T> &tree) {
+        tree.print_node(tree.root, 0);
         return out;
+    }
+
+    MyBinaryTree<T>& operator=(const MyBinaryTree<T>& other)
+    {
+        MyBinaryTree tree();
+        this->root = other.root;
+        return *this;
     }
 };
 
-template<typename T>
-void MyBinaryTree<T>::destroy(TreeNode *node) {
-    TreeNode *cur = node;
-    if (cur != NULL) {
-        destroy(cur->left);
-        destroy(cur->right);
-        delete cur;
-    }
-}
 
 template<typename T>
 void MyBinaryTree<T>::push(T new_value) {
-    TreeNode *new_node = new TreeNode(new_value);
     TreeNode *cur = root;
-    while (cur != NULL)
-    {
-        if (cur->value > new_value)
-            cur = cur->left;
-        else
-            cur = cur->right;
+    TreeNode *new_node = new TreeNode(new_value);
+    while (true) {
+        if (cur->value > new_value) {
+            if (cur->left == NULL) {
+                cur->left = new_node;
+                break;
+            } else
+                cur = cur->left;
+        } else {
+            if (cur->right == NULL) {
+                cur->right = new_node;
+                break;
+            } else
+                cur = cur->right;
+        }
     }
-    cur = new_node;
-    cur->left = cur->right = NULL;
-}
-
-template<typename T>
-std::ostream& MyBinaryTree<T>::print(std::ostream &out, TreeNode *node) const
-{
-    TreeNode *cur = node;
-    if (cur != NULL)
-    {
-        print(cur->left);
-        print(cur->right);
-        out << cur->value;
-    }
-    return out;
 }
 
 #endif //CPP_LAB_10_MYBINARYTREE_H
