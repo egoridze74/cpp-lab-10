@@ -19,22 +19,22 @@ private:
         explicit TreeNode(T new_value) : value(new_value), left(NULL), right(NULL) {}
     };
 
-    void print_node(const TreeNode *cur, size_t depth) const {
+    void print_node(const TreeNode *cur, size_t depth, std::ostream& out) const {
         if (cur == NULL) {
             for (size_t i = 0; i < depth; ++i)
-                std::cout << '\t';
-            std::cout << "none" << std::endl;
+                out << '\t';
+            out << "none" << std::endl;
             return;
         }
-        print_node(cur->right, depth + 1);
+        print_node(cur->right, depth + 1, out);
         for (size_t i = 0; i < depth; ++i)
-            std::cout << '\t';
-        std::cout << cur->value << std::endl;
-        print_node(cur->left, depth + 1);
+            out << '\t';
+        out << cur->value << std::endl;
+        print_node(cur->left, depth + 1, out);
     }
 
 
-    void destroy(TreeNode *node) {
+    void destroy(TreeNode* node) {
         if (node != NULL) {
             destroy(node->left);
             destroy(node->right);
@@ -61,7 +61,7 @@ public:
     void push(T new_value);
 
     friend std::ostream &operator<<(std::ostream &out, const MyBinaryTree<T> &tree) {
-        tree.print_node(tree.root, 0);
+        tree.print_node(tree.root, 0, out);
         return out;
     }
 

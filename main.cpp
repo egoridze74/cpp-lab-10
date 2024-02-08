@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include "MyBinaryTree.h"
 
@@ -17,6 +18,8 @@ int main()
     string_tree.push("99");
     string_tree.push("100");
     string_tree.push("567");
-    std::cout << string_tree << std::endl;
+    std::ofstream out("output.txt");
+    out << string_tree << std::endl;
+    out.close();
     return 0;
 }
